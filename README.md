@@ -2,7 +2,7 @@
 
 # BUDGETBUDY
 
-_Tracks Spendings, Manages Dues, Simplifies Money Management_
+_Detects Spendings, Ensures Quality, Accelerates Money Management_
 
 ![last commit](https://img.shields.io/github/last-commit/devaldaki3/BudgetBudy)
 
