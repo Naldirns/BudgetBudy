@@ -39,87 +39,91 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
 
     await showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Edit Entry'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: amountController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(labelText: 'Amount'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: noteController,
-              decoration: const InputDecoration(labelText: 'Enter Details'),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.event),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    DateFormat('dd MMM, yyyy – hh:mm a').format(date),
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: Colors.grey[50],
+          title: const Text('Edit Entry'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: amountController,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(labelText: 'Amount'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: noteController,
+                decoration: const InputDecoration(labelText: 'Enter Details'),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(Icons.event),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      DateFormat('dd MMM, yyyy – hh:mm a').format(date),
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: date,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime.now(),
-                    );
-                    if (picked != null) {
-                      setState(() {
-                        date = DateTime(picked.year, picked.month, picked.day,
-                            date.hour, date.minute);
-                      });
-                    }
-                  },
-                  child: const Text('Change'),
-                )
-              ],
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: date,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime.now(),
+                      );
+                      if (picked != null) {
+                        setDialogState(() {
+                          date = DateTime(picked.year, picked.month, picked.day,
+                              date.hour, date.minute);
+                        });
+                      }
+                    },
+                    child: const Text('Change'),
+                  )
+                ],
+              )
+            ],
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Cancel')),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFA80852),
+                foregroundColor: Colors.white,
+                shape: const StadiumBorder(),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+              onPressed: () async {
+                final amount = double.tryParse(amountController.text.trim());
+                if (amount == null || amount <= 0) return;
+                final updated = TransactionModel(
+                  id: txn.id,
+                  partyId: txn.partyId,
+                  amount: amount,
+                  type: txn.type,
+                  date: date,
+                  note: noteController.text.trim(),
+                );
+                await DBHelper.updateTransaction(updated);
+                if (!mounted) return;
+                setState(() => txn = updated);
+                _changed = true;
+                Navigator.of(ctx).pop();
+              },
+              child: const Text('Save'),
             )
           ],
         ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFA80852),
-              foregroundColor: Colors.white,
-              shape: const StadiumBorder(),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            ),
-            onPressed: () async {
-              final amount = double.tryParse(amountController.text.trim());
-              if (amount == null || amount <= 0) return;
-              final updated = TransactionModel(
-                id: txn.id,
-                partyId: txn.partyId,
-                amount: amount,
-                type: txn.type,
-                date: date,
-                note: noteController.text.trim(),
-              );
-              await DBHelper.updateTransaction(updated);
-              if (!mounted) return;
-              setState(() => txn = updated);
-              _changed = true;
-              Navigator.of(ctx).pop();
-            },
-            child: const Text('Save'),
-          )
-        ],
       ),
     );
   }
@@ -129,6 +133,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.grey[50],
         title: const Text('Delete Entry'),
         content: const Text('Are you sure you want to delete this entry?'),
         actions: [
@@ -156,7 +161,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final isGave = txn.type == TransactionType.gave;
-    final color = isGave ? Colors.red : Colors.green;
+    final color = isGave ? const Color(0xFFDF1837) : const Color(0xFF029856);
     return WillPopScope(
       onWillPop: () async {
         Navigator.of(context).pop(_changed);
@@ -209,7 +214,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   const Text('Details',
                       style: TextStyle(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 6),
-                  Text(txn.note.isEmpty ? '-' : txn.note),
+                  Text(
+                    txn.note.isEmpty ? '-' : txn.note,
+                    style: const TextStyle(fontWeight: FontWeight.w900),
+                  ),
                 ],
               ),
             ),

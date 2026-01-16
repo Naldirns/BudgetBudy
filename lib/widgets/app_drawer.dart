@@ -65,6 +65,7 @@ class AppDrawer extends StatelessWidget {
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
+                                backgroundColor: Colors.grey[50],
                                 title: Text('Contact Us'),
                                 content: Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -99,6 +100,7 @@ class AppDrawer extends StatelessWidget {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
+                              backgroundColor: Colors.grey[50],
                               title: Text('Contact Us'),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,

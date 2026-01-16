@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../database/db_helper.dart';
 import '../models/party.dart';
@@ -55,16 +56,22 @@ class _AddPartyScreenState extends State<AddPartyScreen> {
               TextFormField(
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(10),
+                ],
                 decoration: const InputDecoration(
                   labelText: 'Phone (optional)',
+                  prefixText: '+91 ',
                   prefixIcon: Icon(Icons.phone_outlined),
                 ),
                 validator: (v) {
                   final value = v?.trim() ?? '';
                   if (value.isEmpty) return null;
-                  final phoneRe = RegExp(r'^[0-9]{10}$');
-                  if (!phoneRe.hasMatch(value)) {
-                    return 'Enter valid 10-digit phone';
+                  // Validate Indian phone number (10 digits, starts with 6-9)
+                  if (value.length != 10 ||
+                      !RegExp(r'^[6-9]\d{9}$').hasMatch(value)) {
+                    return 'Enter valid 10-digit Indian phone';
                   }
                   return null;
                 },

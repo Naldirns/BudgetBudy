@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../database/db_helper.dart';
 import '../models/party.dart';
@@ -72,6 +74,10 @@ class _PartyProfileScreenState extends State<PartyProfileScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
         padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -114,22 +120,60 @@ class _PartyProfileScreenState extends State<PartyProfileScreen> {
                     subtitle: Text(_currentParty.phone),
                     trailing: IconButton(
                       icon: const Icon(Icons.call, color: Colors.green),
-                      onPressed: () {
-                        // TODO: Add phone call functionality
+                      onPressed: () async {
+                        // Clean phone number and add Indian country code
+                        String phone = _currentParty.phone
+                            .replaceAll(RegExp(r'[\s\-\(\)]'), '');
+                        // Add +91 if not already present
+                        if (!phone.startsWith('+91') &&
+                            !phone.startsWith('91')) {
+                          phone = '+91$phone';
+                        } else if (phone.startsWith('91') &&
+                            !phone.startsWith('+')) {
+                          phone = '+$phone';
+                        }
+                        final Uri phoneUri = Uri.parse('tel:$phone');
+                        try {
+                          await launchUrl(phoneUri);
+                        } catch (e) {
+                          // Silently fail - phone functionality not available on emulator
+                        }
                       },
                     ),
                   )
-                : ListTile(
-                    leading:
-                        const Icon(Icons.phone_outlined, color: Colors.grey),
-                    title: const Text('Add Phone Number'),
-                    trailing: const Icon(Icons.add, color: Colors.blue),
-                    onTap: () {
-                      Navigator.of(ctx).pop();
-                      _showAddPhoneDialog();
-                    },
-                  ),
+                : const SizedBox.shrink(),
             const SizedBox(height: 16),
+            // Edit Party button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFA80852),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    _showEditPartyDialog();
+                  },
+                  icon: const Icon(Icons.edit),
+                  label: const Text(
+                    'Edit Party',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
             // Delete button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -151,6 +195,7 @@ class _PartyProfileScreenState extends State<PartyProfileScreen> {
                     final confirm = await showDialog<bool>(
                       context: context,
                       builder: (ctx) => AlertDialog(
+                        backgroundColor: Colors.grey[50],
                         title: const Text('Delete Party'),
                         content: const Text(
                             'Delete this party and all its entries? This cannot be undone.'),
@@ -195,20 +240,43 @@ class _PartyProfileScreenState extends State<PartyProfileScreen> {
     );
   }
 
-  void _showAddPhoneDialog() {
-    final phoneController = TextEditingController();
+  void _showEditPartyDialog() {
+    final nameController = TextEditingController(text: _currentParty.name);
+    final phoneController = TextEditingController(
+      text: _currentParty.phone.isNotEmpty ? _currentParty.phone : '',
+    );
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Add Phone Number'),
-        content: TextField(
-          controller: phoneController,
-          keyboardType: TextInputType.phone,
-          decoration: const InputDecoration(
-            labelText: 'Phone Number',
-            hintText: 'Enter phone number',
-            prefixIcon: Icon(Icons.phone),
-          ),
+        backgroundColor: Colors.grey[50],
+        title: const Text('Edit Party'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                hintText: 'Enter party name',
+                prefixIcon: Icon(Icons.person),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: phoneController,
+              keyboardType: TextInputType.phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ],
+              decoration: const InputDecoration(
+                labelText: 'Phone Number',
+                prefixText: '+91 ',
+                prefixIcon: Icon(Icons.phone),
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -224,29 +292,54 @@ class _PartyProfileScreenState extends State<PartyProfileScreen> {
               ),
             ),
             onPressed: () async {
+              final name = nameController.text.trim();
               final phone = phoneController.text.trim();
-              if (phone.isEmpty) {
+
+              // Validate name
+              if (name.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Please enter a phone number'),
+                    content: Text('Please enter a name'),
                     backgroundColor: Colors.orange,
                   ),
                 );
                 return;
               }
 
+              // Validate and clean phone number
+              String cleanPhone = '';
+              if (phone.isNotEmpty) {
+                cleanPhone = phone.replaceAll(RegExp(r'[\s\-\+]'), '');
+
+                // Remove country code if present
+                if (cleanPhone.startsWith('91') && cleanPhone.length == 12) {
+                  cleanPhone = cleanPhone.substring(2);
+                }
+
+                // Validate Indian phone number
+                if (cleanPhone.length != 10 ||
+                    !RegExp(r'^[6-9]\d{9}$').hasMatch(cleanPhone)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                          'Please enter a valid 10-digit Indian phone number'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+              }
+
               try {
-                // Update party phone in database
                 final updatedParty = Party(
                   id: _currentParty.id,
-                  name: _currentParty.name,
-                  phone: phone,
+                  name: name,
+                  phone: cleanPhone,
                 );
 
                 final result = await DBHelper.updateParty(updatedParty);
 
                 if (result > 0) {
-                  // Update local party state
                   setState(() {
                     _currentParty = updatedParty;
                   });
@@ -257,7 +350,7 @@ class _PartyProfileScreenState extends State<PartyProfileScreen> {
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Phone number added successfully!'),
+                      content: Text('Party updated successfully!'),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -266,7 +359,7 @@ class _PartyProfileScreenState extends State<PartyProfileScreen> {
                   if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Failed to update phone number'),
+                      content: Text('Failed to update party'),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -399,7 +492,8 @@ class _PartyProfileScreenState extends State<PartyProfileScreen> {
     final bool isGive =
         _balance > 0; // positive => you will give; negative => you will get
     final bool isZero = _balance == 0;
-    final Color balColor = isGive ? Colors.red : Colors.green;
+    final Color balColor =
+        isGive ? const Color(0xFFDF1837) : const Color(0xFF029856);
     final String summaryLabel = isGive ? 'You will give' : 'You will get';
     final double displayAmount = _balance.abs();
     return Scaffold(
@@ -501,16 +595,16 @@ class _PartyProfileScreenState extends State<PartyProfileScreen> {
                         children: [
                           Text(
                             summaryLabel,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w700,
-                              color: Colors.grey[800],
+                              color: Colors.black,
                             ),
                           ),
                           Text(
                             '₹ ${displayAmount.toStringAsFixed(0)}',
                             style: TextStyle(
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w900,
                               fontSize: 22,
                               color: balColor,
                             ),
@@ -559,7 +653,10 @@ class _PartyProfileScreenState extends State<PartyProfileScreen> {
                     if (item is DateTime) {
                       return _DateHeader(date: item);
                     } else if (item is TransactionModel) {
-                      return TransactionTile(txn: item);
+                      return TransactionTile(
+                        txn: item,
+                        onChanged: _load,
+                      );
                     }
                     return const SizedBox.shrink();
                   },
@@ -584,7 +681,7 @@ class _PartyProfileScreenState extends State<PartyProfileScreen> {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: Colors.black,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -691,7 +788,7 @@ class _DateHeader extends StatelessWidget {
           style: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 12,
-            color: Colors.black87,
+            color: Colors.black,
           ),
         ),
       ),

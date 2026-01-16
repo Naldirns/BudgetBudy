@@ -69,21 +69,28 @@ class _TransactionListItemsState extends State<TransactionListItems> {
                       context: context,
                       barrierDismissible: false,
                       builder: (context) => AlertDialog(
+                        backgroundColor: Colors.grey[50],
                         title: const Text('Are you sure'),
                         content: const Text(
                             'Do you really want to delete this transaction?'),
                         actions: [
-                          TextButton(
-                              onPressed: () {
-                                widget.dltTrxItem(widget.trx.id);
-                                Navigator.pop(context);
-                              },
-                              child: Text(
-                                'Yes',
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    color: Theme.of(context).primaryColor),
-                              )),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            onPressed: () {
+                              widget.dltTrxItem(widget.trx.id);
+                              Navigator.pop(context);
+                            },
+                            child: const Text(
+                              'Yes',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          ),
                           TextButton(
                               onPressed: () {
                                 Navigator.pop(context);

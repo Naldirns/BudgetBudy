@@ -43,24 +43,26 @@ class MyApp extends StatelessWidget {
                     headlineLarge: const TextStyle(
                       fontFamily: 'OpenSans',
                       fontSize: 18,
-                      color:
-                          Color(0xFF1D2125), // dark grey instead of pure black
+                      color: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
                     labelLarge: const TextStyle(
-                      color: Color(0xFF1D2125),
+                      color: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
               appBarTheme: const AppBarTheme(
                 backgroundColor: Colors.white,
                 elevation: 0,
-                iconTheme: IconThemeData(color: Color(0xFF1D2125)),
+                iconTheme: IconThemeData(color: Colors.black),
                 titleTextStyle: TextStyle(
                   fontFamily: 'OpenSans',
                   fontSize: 24,
-                  color: Color(0xFF1D2125),
+                  color: Colors.black,
                 ),
+              ),
+              datePickerTheme: DatePickerThemeData(
+                backgroundColor: Colors.grey[50],
               ),
             ),
             routes: {

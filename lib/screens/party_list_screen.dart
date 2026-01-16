@@ -158,16 +158,17 @@ class _PartyListScreenState extends State<PartyListScreen> {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 16),
+                                          fontSize: 16,
+                                          color: Colors.black),
                                     ),
                                     const SizedBox(height: 6),
                                     Text(
                                       '₹ ${give.toStringAsFixed(0)}',
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
+                                        fontWeight: FontWeight.w900,
                                         fontSize: 20,
-                                        color: Colors.red,
+                                        color: Color(0xFFDF1837),
                                       ),
                                     ),
                                   ],
@@ -186,16 +187,17 @@ class _PartyListScreenState extends State<PartyListScreen> {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 16),
+                                          fontSize: 16,
+                                          color: Colors.black),
                                     ),
                                     const SizedBox(height: 6),
                                     Text(
                                       '₹ ${get.toStringAsFixed(0)}',
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
+                                        fontWeight: FontWeight.w900,
                                         fontSize: 20,
-                                        color: Colors.green,
+                                        color: Color(0xFF029856),
                                       ),
                                     ),
                                   ],
@@ -251,7 +253,7 @@ class _PartyListScreenState extends State<PartyListScreen> {
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 15,
-                                      color: Colors.black87,
+                                      color: Colors.black,
                                     ),
                                   ),
                                 ),
@@ -261,15 +263,15 @@ class _PartyListScreenState extends State<PartyListScreen> {
                                   builder: (context, snap) {
                                     final bal = (snap.data ?? 0);
                                     final Color textColor = bal == 0
-                                        ? Colors.grey.shade700
+                                        ? Colors.black
                                         : (bal > 0
-                                            ? Colors.red.shade700
-                                            : Colors.green.shade700);
+                                            ? const Color(0xFFDF1837)
+                                            : const Color(0xFF029856));
                                     return Text(
                                       '₹ ${bal.abs().toStringAsFixed(0)}',
                                       style: TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 15,
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 18,
                                         color: textColor,
                                       ),
                                     );

@@ -117,52 +117,71 @@ class _NewTransactionState extends State<NewTransaction> {
                 ),
                 onPressed: () {
                   FocusScope.of(context).unfocus();
-                  if (inputTitleController.text.isNotEmpty &&
-                      (int.parse(inputAmountController.text)) >= 0 &&
-                      _selectedDate != null) {
-                    final enteredTitle = inputTitleController.text;
-                    final enteredAmount = int.parse(inputAmountController.text);
-
-                    transactions.addTransactions(
-                      Transaction(
-                        id: DateTime.now().toString(),
-                        title: enteredTitle,
-                        amount: enteredAmount,
-                        date: _selectedDate,
-                        category: dropdownValue,
-                      ),
-                    );
-                    //Navigator.of(context).pop();
-                    inputTitleController.clear();
-                    inputAmountController.clear();
-                    setState(() {
-                      // _selectedDate = DateTime.now();
-                      dropdownValue = 'Other';
-                    });
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: Theme.of(context).primaryColorLight,
-                        content: Text(
-                          "Data added Succesfully!",
-                          style: Theme.of(context).textTheme.headlineLarge,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    );
-                  } else {
+                  
+                  // Validate title
+                  if (inputTitleController.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         backgroundColor: Theme.of(context).colorScheme.error,
                         content: Text(
-                          "Fields can't be empty!",
+                          "Please enter a title!",
                           style: Theme.of(context).textTheme.headlineLarge,
                           textAlign: TextAlign.center,
                         ),
                       ),
                     );
+                    return;
                   }
+                  
+                  // Validate amount with safe parsing
+                  final amountText = inputAmountController.text.trim();
+                  final enteredAmount = int.tryParse(amountText);
+                  
+                  if (enteredAmount == null || enteredAmount < 0) {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        content: Text(
+                          "Please enter a valid amount!",
+                          style: Theme.of(context).textTheme.headlineLarge,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+                  
+                  final enteredTitle = inputTitleController.text.trim();
+
+                  transactions.addTransactions(
+                    Transaction(
+                      id: DateTime.now().toString(),
+                      title: enteredTitle,
+                      amount: enteredAmount,
+                      date: _selectedDate,
+                      category: dropdownValue,
+                    ),
+                  );
+                  //Navigator.of(context).pop();
+                  inputTitleController.clear();
+                  inputAmountController.clear();
+                  setState(() {
+                    // _selectedDate = DateTime.now();
+                    dropdownValue = 'Other';
+                  });
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: Theme.of(context).primaryColorLight,
+                      content: Text(
+                        "Data added Succesfully!",
+                        style: Theme.of(context).textTheme.headlineLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
                 },
               ),
             ],
